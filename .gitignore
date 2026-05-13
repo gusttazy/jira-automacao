@@ -1,0 +1,50 @@
+# Dependências
+node_modules/
+package-lock.json
+
+# Build
+dist/
+
+# Dados sensíveis - NUNCA commitar
+data/
+*.csv
+
+# Sessão do navegador (contém cookies e credenciais)
+jira_session_data/
+
+# Screenshots de debug
+debug-*.png
+erro-*.png
+
+# Variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# AI / Assistentes
+.gemini/
+
+# TypeScript
+*.tsbuildinfo
+
+# Playwright
+test-results/
+playwright-report/

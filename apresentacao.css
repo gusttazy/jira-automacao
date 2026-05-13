@@ -1,0 +1,485 @@
+/* ================================================================
+   Automação Jira — Apresentação
+   Autor: Gustavo Rodrigues de Aguiar
+   ================================================================ */
+
+/* ── 1. Reset & Variáveis ─────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Cores base */
+  --bg: #0b0f1a;
+  --surface: #131825;
+  --border: rgba(255, 255, 255, .06);
+
+  /* Texto */
+  --text: #e4e8f1;
+  --text-muted: #8892a8;
+
+  /* Acentos */
+  --accent: #6c63ff;
+  --accent-glow: rgba(108, 99, 255, .25);
+  --accent-soft: #a78bfa;
+
+  /* Status */
+  --green: #34d399;
+  --green-glow: rgba(52, 211, 153, .15);
+  --amber: #fbbf24;
+  --amber-glow: rgba(251, 191, 36, .12);
+  --blue: #60a5fa;
+  --red: #f87171;
+
+  /* Espaçamento & Forma */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --pill-radius: 99px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 2. Scrollbar ─────────────────────────────── */
+
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(108, 99, 255, .3); border-radius: var(--pill-radius); }
+
+/* ── 3. Hero ──────────────────────────────────── */
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -100px auto auto 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: pulse-glow 6s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: .5; transform: translateX(-50%) scale(1); }
+  50%      { opacity: .8; transform: translateX(-50%) scale(1.15); }
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--pill-radius);
+  background: rgba(108, 99, 255, .1);
+  border: 1px solid rgba(108, 99, 255, .25);
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero__title {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  max-width: 700px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero__title .gradient-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 50%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero__subtitle {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 540px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero__author {
+  margin-top: 32px;
+  font-size: .85rem;
+  color: var(--text-muted);
+  position: relative;
+  z-index: 1;
+}
+
+.hero__author strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 36px;
+  z-index: 1;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.scroll-hint svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--text-muted);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(8px); }
+}
+
+/* ── 4. Seções (layout genérico) ──────────────── */
+
+.section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.section__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.section__title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  margin-bottom: 12px;
+}
+
+.section__desc {
+  color: var(--text-muted);
+  max-width: 600px;
+  margin-bottom: 48px;
+  font-size: .95rem;
+}
+
+/* ── 5. Card de Objetivo ──────────────────────── */
+
+.objective-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.objective-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+}
+
+.objective-card p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ── 6. Fluxo Visual ─────────────────────────── */
+
+.flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 48px 0;
+}
+
+.flow__node {
+  padding: 16px 24px;
+  border-radius: var(--radius-sm);
+  font-size: .85rem;
+  font-weight: 600;
+  text-align: center;
+  min-width: 160px;
+}
+
+.flow__node--waiting  { background: rgba(251, 191, 36, .08); border: 1px solid rgba(251, 191, 36, .2); color: var(--amber); }
+.flow__node--progress { background: rgba(96, 165, 250, .08); border: 1px solid rgba(96, 165, 250, .2); color: var(--blue); }
+.flow__node--done     { background: var(--green-glow);        border: 1px solid rgba(52, 211, 153, .2); color: var(--green); }
+
+.flow__arrow {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  padding: 0 8px;
+}
+
+.flow__label {
+  display: block;
+  margin-top: 6px;
+  font-size: .7rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* ── 7. Timeline de Passos ────────────────────── */
+
+.steps {
+  display: flex;
+  flex-direction: column;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  position: relative;
+}
+
+.step__indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step__number {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: .85rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  box-shadow: 0 0 20px var(--accent-glow);
+  position: relative;
+  z-index: 2;
+}
+
+.step__line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(180deg, rgba(108, 99, 255, .3), rgba(108, 99, 255, .05));
+}
+
+.step:last-child .step__line {
+  display: none;
+}
+
+.step__content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  transition: border-color .3s, box-shadow .3s;
+}
+
+.step__content:hover {
+  border-color: rgba(108, 99, 255, .2);
+  box-shadow: 0 4px 24px rgba(108, 99, 255, .06);
+}
+
+.step__content h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.step__content h3 .emoji {
+  font-size: 1.3rem;
+}
+
+.step__content p {
+  color: var(--text-muted);
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+/* Tags de categoria */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-top: 12px;
+}
+
+.tag--auto { background: var(--green-glow); color: var(--green); border: 1px solid rgba(52, 211, 153, .2); }
+.tag--data { background: var(--amber-glow); color: var(--amber); border: 1px solid rgba(251, 191, 36, .15); }
+.tag--ui   { background: rgba(96, 165, 250, .1); color: var(--blue); border: 1px solid rgba(96, 165, 250, .15); }
+
+/* ── 8. Grid de Features ──────────────────────── */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: transform .25s, border-color .3s, box-shadow .3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(108, 99, 255, .2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .3);
+}
+
+.feature-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+}
+
+.feature-card__icon--purple { background: rgba(108, 99, 255, .12); }
+.feature-card__icon--green  { background: var(--green-glow); }
+.feature-card__icon--amber  { background: var(--amber-glow); }
+.feature-card__icon--blue   { background: rgba(96, 165, 250, .1); }
+.feature-card__icon--red    { background: rgba(248, 113, 113, .1); }
+
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  font-size: .85rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* ── 9. Tech Stack ────────────────────────────── */
+
+.tech-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tech-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--pill-radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: .85rem;
+  font-weight: 500;
+  transition: border-color .3s;
+}
+
+.tech-pill:hover {
+  border-color: rgba(108, 99, 255, .3);
+}
+
+.tech-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tech-pill__dot--ts   { background: #3178c6; }
+.tech-pill__dot--pw   { background: #2ead33; }
+.tech-pill__dot--node { background: #68a063; }
+.tech-pill__dot--csv  { background: var(--amber); }
+
+/* ── 10. Footer ───────────────────────────────── */
+
+.footer {
+  text-align: center;
+  padding: 48px 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: .8rem;
+}
+
+.footer strong {
+  color: var(--text);
+}
+
+/* ── 11. Utilitários ──────────────────────────── */
+
+.code-inline {
+  background: rgba(108, 99, 255, .12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: .8rem;
+}
+
+/* ── 12. Responsivo ───────────────────────────── */
+
+@media (max-width: 600px) {
+  .step            { grid-template-columns: 56px 1fr; }
+  .step__number    { width: 40px; height: 40px; font-size: .75rem; }
+  .step__content   { padding: 20px; }
+  .flow            { flex-direction: column; gap: 8px; }
+  .flow__arrow     { transform: rotate(90deg); }
+}

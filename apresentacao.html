@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Apresentação da automação de triagem de tickets no Jira Service Management" />
+  <title>Automação Jira — Triagem de Tickets</title>
+
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="apresentacao.css" />
+</head>
+
+<body>
+  <!-- ══════════════════════════════════════════
+       HERO
+       ══════════════════════════════════════════ -->
+  <header class="hero" id="hero">
+    <div class="hero-badge"><span>⚡</span> Automação Inteligente</div>
+
+    <h1 class="hero__title">
+      Triagem Automática de<br />
+      <span class="gradient-text">Tickets no Jira</span>
+    </h1>
+
+    <p class="hero__subtitle">
+      Bot que monitora o board Kanban em tempo real, identifica tickets por
+      placa de veículo e executa todo o fluxo de resolução automaticamente.
+    </p>
+
+    <p class="hero__author">
+      Desenvolvido por <strong>Gustavo Rodrigues de Aguiar</strong>
+    </p>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       VISÃO GERAL
+       ══════════════════════════════════════════ -->
+  <section class="section" id="visao-geral">
+    <div class="section__label">📌 Visão Geral</div>
+    <h2 class="section__title">O que essa automação faz?</h2>
+
+    <div class="objective-card">
+      <p>
+        Esta automação
+        <span class="highlight">elimina o trabalho manual de triagem</span> de
+        tickets no Jira Service Management. Ela lê uma planilha CSV com placas
+        de veículos e seus tipos de alerta, e então
+        <span class="highlight">monitora continuamente</span> o board Kanban
+        em busca de tickets que contenham essas placas. Quando encontra um
+        match, o bot
+        <span class="highlight">transita o status do ticket automaticamente</span>
+        (de "Aguardando Atendimento" até "Done"), preenche o formulário de
+        resolução com o tipo de alerta correto e adiciona um comentário
+        padronizado — tudo sem intervenção humana.
+      </p>
+    </div>
+
+    <!-- Fluxo de Status -->
+    <div class="flow">
+      <div class="flow__node flow__node--waiting">
+        ⏳ Aguardando<br />Atendimento
+        <span class="flow__label">Ticket novo na fila</span>
+      </div>
+      <div class="flow__arrow">→</div>
+      <div class="flow__node flow__node--progress">
+        🔧 Em<br />Atendimento
+        <span class="flow__label">Bot inicia tratamento</span>
+      </div>
+      <div class="flow__arrow">→</div>
+      <div class="flow__node flow__node--done">
+        ✅ Done
+        <span class="flow__label">Resolvido + comentário</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       PASSO A PASSO
+       ══════════════════════════════════════════ -->
+  <section class="section" id="passo-a-passo">
+    <div class="section__label">🔢 Passo a Passo</div>
+    <h2 class="section__title">Como funciona?</h2>
+    <p class="section__desc">
+      O bot segue um fluxo linear em cada ciclo de execução. O processo se
+      repete indefinidamente, verificando novos tickets a cada 15 segundos.
+    </p>
+
+    <div class="steps">
+      <!-- Passo 1 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">1</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">📂</span> Carrega a Planilha</h3>
+          <p>
+            Lê o arquivo <strong>dados.csv</strong> contendo as placas de
+            veículos e seus respectivos tipos de alerta. Os dados são
+            indexados em memória para busca instantânea.
+          </p>
+          <span class="tag tag--data">Dados</span>
+        </div>
+      </article>
+
+      <!-- Passo 2 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">2</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">🌐</span> Abre o Navegador</h3>
+          <p>
+            Inicia o Chromium com <strong>sessão persistente</strong> — se
+            você já fez login antes, a autenticação é reutilizada
+            automaticamente. Navega direto para o board Kanban do Jira.
+          </p>
+          <span class="tag tag--auto">Automático</span>
+        </div>
+      </article>
+
+      <!-- Passo 3 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">3</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">🔍</span> Escaneia os Tickets</h3>
+          <p>
+            Localiza todos os cards nas colunas
+            <strong>"Aguardando Atendimento"</strong> e
+            <strong>"Em Atendimento"</strong>. Para cada card, extrai o texto
+            e procura uma placa de veículo usando regex. Detecta automaticamente
+            alertas especiais como <strong>"ENERGIA CORTADA"</strong> e
+            <strong>"DESCONEXÃO DE BATERIA"</strong>.
+          </p>
+          <span class="tag tag--ui">Interface</span>
+        </div>
+      </article>
+
+      <!-- Passo 4 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">4</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">✅</span> Valida a Placa</h3>
+          <p>
+            Verifica se a placa encontrada no ticket existe na planilha CSV.
+            Se existir, recupera o <strong>tipo de alerta</strong> associado.
+            Tickets sem match são ignorados.
+          </p>
+          <span class="tag tag--data">Dados</span>
+        </div>
+      </article>
+
+      <!-- Passo 5 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">5</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">🚀</span> Transita o Status</h3>
+          <p>
+            Abre o painel lateral do ticket, clica no botão de status e
+            avança:
+            <strong>Aguardando → Em Atendimento → Done</strong>. Se o ticket
+            já está "Em Atendimento", pula direto para "Done".
+          </p>
+          <span class="tag tag--ui">Interface</span>
+        </div>
+      </article>
+
+      <!-- Passo 6 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">6</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">📝</span> Preenche o Formulário</h3>
+          <p>
+            Na modal "Alerta Tratado", seleciona <strong>"Nenhum"</strong> no
+            dropdown de meios de contato e digita o comentário padronizado:
+            <code class="code-inline">[AUTOMAÇÃO] tipo_do_alerta</code>
+          </p>
+          <span class="tag tag--auto">Automático</span>
+        </div>
+      </article>
+
+      <!-- Passo 7 -->
+      <article class="step">
+        <div class="step__indicator">
+          <div class="step__number">7</div>
+          <div class="step__line"></div>
+        </div>
+        <div class="step__content">
+          <h3><span class="emoji">🔄</span> Repete o Ciclo</h3>
+          <p>
+            Após tratar todos os tickets encontrados, recarrega a página e
+            inicia um novo ciclo. Se nenhum ticket foi tratado, aguarda
+            <strong>15 segundos</strong> antes de verificar novamente. Em caso
+            de erro fatal, o bot <strong>reinicia automaticamente</strong>
+            após um cooldown de 10 segundos — sem intervenção humana.
+          </p>
+          <span class="tag tag--auto">Contínuo</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       DESTAQUES
+       ══════════════════════════════════════════ -->
+  <section class="section" id="destaques">
+    <div class="section__label">⭐ Destaques</div>
+    <h2 class="section__title">Principais pontos</h2>
+    <p class="section__desc">
+      Os diferenciais técnicos e operacionais que tornam essa automação
+      confiável em produção.
+    </p>
+
+    <div class="features-grid">
+      <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--green">🔄</div>
+        <h3>Operação Contínua</h3>
+        <p>
+          Loop infinito que monitora o board 24 horas por dia, 7 dias por
+          semana, sem necessidade de intervenção manual.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--purple">🧠</div>
+        <h3>Validação Inteligente</h3>
+        <p>
+          Extrai placas de veículos via regex (formatos antigo e Mercosul) e
+          cruza automaticamente com a base CSV.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--blue">🔐</div>
+        <h3>Sessão Persistente</h3>
+        <p>
+          Login feito uma única vez. Cookies e sessão são salvos localmente e
+          reutilizados em todas as execuções seguintes.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--amber">🛡️</div>
+        <h3>Auto-Restart Resiliente</h3>
+        <p>
+          Se algo der errado, o bot fecha o navegador com segurança, aguarda
+          um cooldown e reinicia toda a automação do zero — garantindo
+          operação contínua 24/7.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--red">🎯</div>
+        <h3>Múltiplas Estratégias</h3>
+        <p>
+          3 formas diferentes de localizar cards no DOM do Jira, com fallbacks
+          automáticos para lidar com mudanças na interface.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-card__icon feature-card__icon--green">📊</div>
+        <h3>CSV Flexível</h3>
+        <p>
+          Aceita delimitadores ";" e ",", múltiplos formatos de cabeçalho, e
+          ignora linhas inválidas sem quebrar a execução.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       STACK TECNOLÓGICA
+       ══════════════════════════════════════════ -->
+  <section class="section" id="stack">
+    <div class="section__label">🛠️ Tecnologias</div>
+    <h2 class="section__title">Stack utilizada</h2>
+
+    <div class="tech-row">
+      <div class="tech-pill">
+        <span class="tech-pill__dot tech-pill__dot--ts"></span> TypeScript
+      </div>
+      <div class="tech-pill">
+        <span class="tech-pill__dot tech-pill__dot--pw"></span> Playwright
+      </div>
+      <div class="tech-pill">
+        <span class="tech-pill__dot tech-pill__dot--node"></span> Node.js
+      </div>
+      <div class="tech-pill">
+        <span class="tech-pill__dot tech-pill__dot--csv"></span> csv-parse
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════ -->
+  <footer class="footer">
+    <p>
+      Automação Jira Kanban Triage &middot; Desenvolvido por
+      <strong>Gustavo Rodrigues de Aguiar</strong>
+    </p>
+  </footer>
+</body>
+
+</html>
